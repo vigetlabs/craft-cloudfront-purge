@@ -1,5 +1,5 @@
 {
-  "name": "kayqq/craft-cloudfront-purge",
+  "name": "vigetlabs/craft-cloudfront-purge",
   "description": "A Craft CMS 3.x plugin that enables automatic Cloudfront Cache invalidation on entry save",
   "type": "craft-plugin",
   "version": "1.0.6",
@@ -11,11 +11,15 @@
     "cloudfront purge"
   ],
   "support": {
-    "docs": "https://github.com/kayqq/craft-cloudfront-purge/blob/master/README.md",
-    "issues": "https://github.com/kayqq/craft-cloudfront-purge/issues"
+    "docs": "https://github.com/vigetlabs/craft-cloudfront-purge/blob/master/README.md",
+    "issues": "https://github.com/vigetlabs/craft-cloudfront-purge/issues"
   },
   "license": "MIT",
   "authors": [
+    {
+      "name": "Chris Jones",
+      "homepage": "https://www.viget.com"
+    },
     {
       "name": "Kenny Quan",
       "homepage": "https://www.github.com/kayqq"
