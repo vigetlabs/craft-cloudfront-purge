@@ -77,6 +77,13 @@ class CloudFrontPurge extends Plugin
    */
   public $schemaVersion = '1.1.0';
 
+  /**
+   * Flag for whether the plugin is already purging
+   *
+   * @var bool
+   */
+  public $purging = false;
+
   // Public Methods
   // =========================================================================
 
@@ -95,6 +102,8 @@ class CloudFrontPurge extends Plugin
   {
     parent::init();
     self::$plugin = $this;
+
+    $this->purging = false;
 
     Event::on(
       Elements::class,
@@ -178,6 +187,12 @@ class CloudFrontPurge extends Plugin
   }
 
   public function purgeElement($element) {
+      if ($this->isPurging()) {
+          return;
+      }
+
+      $this->startPurging();
+
       switch (true) {
       case $element instanceof \craft\elements\Entry:
           if (
@@ -223,6 +238,12 @@ class CloudFrontPurge extends Plugin
    */
   public function purgeAll()
   {
+      if ($this->isPurging()) {
+          return;
+      }
+
+      $this->startPurging();
+
       Craft::info("Invalidating all paths.");
 
       // Clear all of CloudFront's caches
@@ -418,5 +439,13 @@ class CloudFrontPurge extends Plugin
       'secret' => Craft::parseEnv($settings->secret),
       'region' => Craft::parseEnv($settings->region),
     ];
+  }
+
+  private function isPurging(): bool {
+      return $this->purging;
+  }
+
+  private function startPurging() {
+      $this->purging = true;
   }
 }
