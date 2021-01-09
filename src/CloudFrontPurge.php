@@ -75,7 +75,7 @@ class CloudFrontPurge extends Plugin
    *
    * @var string
    */
-  public $schemaVersion = '1.1.0';
+  public $schemaVersion = '1.1.1';
 
   /**
    * Flag for whether the plugin is already purging
