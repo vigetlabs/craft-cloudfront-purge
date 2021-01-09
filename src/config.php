@@ -23,4 +23,12 @@
  * you do for 'general.php'
  */
 
-return [];
+return [
+    'keyId'            => '',
+    'secret'           => '',
+    'region'           => '',
+    'cfDistributionId' => '',
+    'cfPrefix'         => '',
+    'cfSuffix'         => '',
+    'purgeBehavior'    => 'entry',
+];

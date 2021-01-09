@@ -100,46 +100,7 @@ class CloudFrontPurge extends Plugin
       Elements::class,
       Elements::EVENT_AFTER_SAVE_ELEMENT,
       function (ElementEvent $event) {
-        $element = $event->element;
-        switch (true) {
-          case $element instanceof \craft\elements\Entry:
-            if (
-              $element->uri // has a uri
-              && !ElementHelper::isDraftOrRevision($element) // is not draft or revision
-              && !$element->propagating // not during propagating (avoid batch propagating)
-              && !$element->resaving // not during resaving (avoid batch resaving)
-            ) {
-              $uri = $element->uri;
-              if ($uri === "__home__") $uri = "";
-              $path = '/' . $this->_cfPrefix() . ltrim($uri, '/') . $this->_cfSuffix();
-              Craft::info("Invalidating Entry path:" . $path);
-              $this->invalidateCdnPath($path);
-            }
-            break;
-          case $element instanceof \craft\elements\Category:
-            if (
-              $element->uri // has a uri
-              && !ElementHelper::isDraftOrRevision($element) // is not draft or revision
-              && !$element->propagating // not during propagating (avoid batch propagating)
-              && !$element->resaving // not during resaving (avoid batch resaving)
-            ) {
-              $uri = $element->uri;
-              $path = '/' . $this->_cfPrefix() . ltrim($uri, '/') . $this->_cfSuffix();
-              Craft::info("Invalidating Category path:" . $path);
-              $this->invalidateCdnPath($path);
-            }
-            break;
-          case $element instanceof \craft\elements\GlobalSet:
-            if (
-              !ElementHelper::isDraftOrRevision($element)
-              && !$element->propagating // not during propagating (avoid batch propagating)
-              && !$element->resaving // not during resaving (avoid batch resaving)
-            ) {
-              Craft::info("Invalidating all paths.");
-              $this->invalidateCdnPath('/*');
-            }
-            break;
-        }
+          $this->processElementEvent($event);
       }
     );
 
@@ -206,13 +167,66 @@ class CloudFrontPurge extends Plugin
     return $behaviors;
   }
 
+  public function processElementEvent(ElementEvent $event) {
+      $settings = $this->getSettings();
+
+      if ($settings->purgeAll()) {
+          $this->purgeAll();
+      } else {
+          $this->purgeElement($event->element);
+      }
+  }
+
+  public function purgeElement($element) {
+      switch (true) {
+      case $element instanceof \craft\elements\Entry:
+          if (
+              $element->uri // has a uri
+              && !ElementHelper::isDraftOrRevision($element) // is not draft or revision
+              && !$element->propagating // not during propagating (avoid batch propagating)
+              && !$element->resaving // not during resaving (avoid batch resaving)
+          ) {
+              $uri = $element->uri;
+              if ($uri === "__home__") $uri = "";
+              $path = '/' . $this->_cfPrefix() . ltrim($uri, '/') . $this->_cfSuffix();
+              Craft::info("Invalidating Entry path:" . $path);
+              $this->invalidateCdnPath($path);
+          }
+          break;
+      case $element instanceof \craft\elements\Category:
+          if (
+              $element->uri // has a uri
+              && !ElementHelper::isDraftOrRevision($element) // is not draft or revision
+              && !$element->propagating // not during propagating (avoid batch propagating)
+              && !$element->resaving // not during resaving (avoid batch resaving)
+          ) {
+              $uri = $element->uri;
+              $path = '/' . $this->_cfPrefix() . ltrim($uri, '/') . $this->_cfSuffix();
+              Craft::info("Invalidating Category path:" . $path);
+              $this->invalidateCdnPath($path);
+          }
+          break;
+      case $element instanceof \craft\elements\GlobalSet:
+          if (
+              !ElementHelper::isDraftOrRevision($element)
+              && !$element->propagating // not during propagating (avoid batch propagating)
+              && !$element->resaving // not during resaving (avoid batch resaving)
+          ) {
+              $this->purgeAll();
+          }
+          break;
+      }
+  }
+
   /**
    * Clear all the caches!
    */
   public function purgeAll()
   {
-    // Clear all of CloudFront's caches
-    $this->invalidateCdnPath('/*');
+      Craft::info("Invalidating all paths.");
+
+      // Clear all of CloudFront's caches
+      $this->invalidateCdnPath('/*');
   }
 
   /**

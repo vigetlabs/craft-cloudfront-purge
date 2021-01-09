@@ -75,3 +75,14 @@
     value: settings.cfSuffix,
     errors: settings.getErrors('cfSuffix')
 }) }}
+
+{{ forms.selectField({
+    label: "Cache Purge Behavior",
+    name: 'purgeBehavior',
+    instructions: "Choose whether saving an entry purges the entire cache or just that entry's cache",
+    value: settings.purgeBehavior,
+    options: [
+      { 'label': 'Single Entry', 'value': 'entry' },
+      { 'label': 'All',          'value': 'all' }
+    ]
+}) }}

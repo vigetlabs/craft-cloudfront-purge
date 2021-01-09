@@ -29,6 +29,9 @@ use craft\base\Model;
  */
 class Settings extends Model
 {
+    const BEHAVIOR_ENTRY = 'entry';
+    const BEHAVIOR_ALL   = 'all';
+
     // Public Properties
     // =========================================================================
 
@@ -62,6 +65,11 @@ class Settings extends Model
      */
     public $cfSuffix = '';
 
+    /**
+     * @var string Purge entry or entire cache on save
+     */
+    public $purgeBehavior = self::BEHAVIOR_ENTRY;
+
     // Public Methods
     // =========================================================================
 
@@ -77,6 +85,16 @@ class Settings extends Model
      */
     public function rules()
     {
-        return [];
+        return [
+            [ 'purgeBehavior', 'in', 'range' => [self::BEHAVIOR_ENTRY, self::BEHAVIOR_ALL]]
+        ];
+    }
+
+    public function purgeOne(): bool {
+        return $this->purgeBehavior === self::BEHAVIOR_ENTRY;
+    }
+
+    public function purgeAll(): bool {
+        return $this->purgeBehavior === self::BEHAVIOR_ALL;
     }
 }
